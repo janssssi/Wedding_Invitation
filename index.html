@@ -128,7 +128,7 @@ p.body{font-size:.95rem;color:var(--ink-soft);max-width:34ch;margin:0 auto}
 .dear{font-family:var(--serif);font-style:italic;font-size:1.25rem;color:var(--ink-soft);margin-bottom:6px;display:none}
 .dear.show{display:block}
 .invited{font-size:.76rem;letter-spacing:.44em;color:var(--gold);text-transform:uppercase;margin-bottom:36px}
-.opening .names{font-family:var(--serif);font-size:3.1rem;font-weight:300;color:var(--mocha);line-height:1.05;margin-top:40px}
+.opening .names{font-family:var(--serif);font-size:clamp(2.4rem,11vw,3rem);font-weight:300;color:var(--mocha);line-height:1.05;margin-top:40px}
 .opening .names em{font-style:italic;color:var(--gold);padding:0 .1em}
 .opening .date{font-size:.8rem;letter-spacing:.3em;text-transform:uppercase;color:var(--ink-soft);margin:14px 0 34px}
 
@@ -374,12 +374,12 @@ form .btn{width:100%;margin-top:8px}
     <p class="invited">You are invited</p>
     <div class="envelope" aria-hidden="true">
       <div class="env-back"></div>
-      <div class="letter"><span class="mono">A &amp; J</span><small>12 · 12 · 27</small></div>
+      <div class="letter"><span class="mono">C &amp; R</span><small>12 · 12 · 27</small></div>
       <div class="env-front"></div>
       <div class="flap"></div>
-      <div class="seal">A&amp;J</div>
+      <div class="seal">C&amp;R</div>
     </div>
-    <h1 class="names">Alex <em>&amp;</em> Jamie</h1>
+    <h1 class="names">Carl <em>&amp;</em> Rocelle</h1>
     <p class="date">December 12, 2027</p>
     <button class="btn solid" id="openBtn" type="button">Open Invitation</button>
   </div>
@@ -407,12 +407,12 @@ form .btn{width:100%;margin-top:8px}
   <!-- 2. ANNOUNCEMENT -->
   <section class="announce" id="announcement">
     <p class="together reveal">Together with our families,</p>
-    <h2 class="names reveal">Alex<em>&amp;</em>Jamie</h2>
+    <h2 class="names reveal">Carl<em>&amp;</em>Rocelle</h2>
     <p class="lead reveal">joyfully invite you to celebrate their wedding.</p>
 
     <div class="arch-frame reveal">
       <div class="photo">
-        <!-- Replace with: <img src="photos/couple.jpg" alt="Alex and Jamie"> -->
+        <!-- Replace with: <img src="photos/couple.jpg" alt="Carl and Rocelle"> -->
         <div class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="5" width="18" height="14" rx="1"/><circle cx="9" cy="11" r="2"/><path d="M21 17l-6-6-8 8"/></svg>Your photo here</div>
       </div>
     </div>
@@ -590,8 +590,8 @@ form .btn{width:100%;margin-top:8px}
         <div class="field">
           <span class="legend" id="att-legend">Will you attend?</span>
           <div class="choices" role="radiogroup" aria-labelledby="att-legend">
-            <label class="choice"><input type="radio" name="attending" value="Joyfully accepts" required><span>Joyfully accepts</span></label>
-            <label class="choice"><input type="radio" name="attending" value="Regretfully declines"><span>Regretfully declines</span></label>
+            <label class="choice"><input type="radio" name="attending" value="Yes" required><span>Joyfully accepts</span></label>
+            <label class="choice"><input type="radio" name="attending" value="No"><span>Regretfully declines</span></label>
           </div>
         </div>
         <div class="field">
@@ -650,7 +650,7 @@ form .btn{width:100%;margin-top:8px}
     <p class="lead">Thank you for being part of our special day.</p>
     <p class="lead" style="margin-top:14px">We look forward to celebrating with you!</p>
     <p class="with">With love,</p>
-    <p class="names">Alex &amp; Jamie</p>
+    <p class="names">Carl &amp; Rocelle</p>
     <svg class="heart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true"><path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/></svg>
     <p class="foot">12 · 12 · 2027</p>
   </section>
@@ -672,13 +672,13 @@ const CONFIG = {
 
   // RSVP via Google Forms. Leave formId empty until ready.
   rsvp: {
-    formId: "",            // from docs.google.com/forms/d/e/THIS_PART/viewform
+    formId: "1FAIpQLSda5zYJ2r_f7pXSqGbBz7Hz5IsF9OU7zjVOY14vj_Cw3L7lAQ",
     entries: {
-      name:      "entry.0000000001",
-      attending: "entry.0000000002",
-      count:     "entry.0000000003",
-      meal:      "entry.0000000004",
-      message:   "entry.0000000005"
+      name:      "entry.16547765",
+      attending: "entry.1558581438",
+      count:     "entry.2029383244",
+      meal:      "entry.535266920",
+      message:   "entry.158307747"
     }
   }
 };
@@ -782,7 +782,7 @@ $('rsvpForm').addEventListener('submit', async e => {
   Object.entries(CONFIG.rsvp.entries).forEach(([k, entry]) => body.append(entry, data.get(k) || ''));
   const btn = $('submitBtn'); btn.disabled = true; btn.textContent = 'Sending…';
   try{
-    await fetch(`https://docs.google.com/forms/d/e/1FAIpQLSda5zYJ2r_f7pXSqGbBz7Hz5IsF9OU7zjVOY14vj_Cw3L7lAQ/viewform?usp=pp_url&entry.16547765=sample+&entry.1558581438=Yes&entry.2029383244=1&entry.535266920=sample+&entry.158307747=sample${CONFIG.rsvp.formId}/formResponse`, { method:'POST', mode:'no-cors', body });
+    await fetch(`https://docs.google.com/forms/d/e/${CONFIG.rsvp.formId}/formResponse`, { method:'POST', mode:'no-cors', body });
     e.target.style.display = 'none'; $('thanks').style.display = 'block';
   }catch{
     btn.disabled = false; btn.textContent = 'Submit RSVP';
