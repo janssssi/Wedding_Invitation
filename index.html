@@ -15,7 +15,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Jost:wght@300;400;500&family=Pinyon+Script&display=swap" rel="stylesheet">
 
 <style>
 /* =========================================================
@@ -39,10 +39,16 @@
 
   --serif:"Cormorant Garamond","Garamond","Times New Roman",serif;
   --sans:"Jost","Helvetica Neue",Arial,sans-serif;
+  --script:"Pinyon Script","Snell Roundhand","Apple Chancery",cursive;
   --col:460px;
   --arch:999px 999px 0 0;
+
+  /* Embossed paper: a soft raised edge used on cards, frames and the timer */
+  --raised:inset 0 1px 0 rgba(255,255,255,.95),0 0 0 1px rgba(180,154,106,.16),0 16px 30px -18px rgba(110,88,72,.42),0 2px 5px rgba(110,88,72,.07);
+  --letterpress:0 1px 0 rgba(255,255,255,.9),0 -1px 0 rgba(110,88,72,.08);
 }
 *{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none !important}
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
 body{
   font-family:var(--sans);font-weight:300;color:var(--ink);
@@ -57,15 +63,22 @@ a{color:inherit}
   max-width:var(--col);margin:0 auto;background:var(--paper);min-height:100vh;
   position:relative;overflow:hidden;box-shadow:0 0 80px rgba(110,88,72,.14);
 }
-.site::before{
-  content:"";position:absolute;inset:0;pointer-events:none;opacity:.4;
-  background-image:radial-gradient(rgba(110,88,72,.055) 1px,transparent 1px);background-size:4px 4px;
+/* Paper grain */
+.site::before,.opening::before{
+  content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .43 0 0 0 0 .35 0 0 0 0 .28 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
+
+/* Embossed flower clusters (drawn in the SVG defs at the top of <body>) */
+.bloom{position:absolute;pointer-events:none;overflow:visible;z-index:1}
+.bloom.tr{transform:scaleX(-1)}
+.bloom.bl{transform:scaleY(-1)}
+.bloom.br{transform:rotate(180deg)}
 
 section{position:relative;padding:96px 34px;text-align:center}
 
 /* Shared type */
-h2{font-family:var(--serif);font-weight:300;font-size:2.35rem;line-height:1.1;color:var(--mocha);letter-spacing:.005em}
+h2{font-family:var(--script);font-weight:400;font-size:2.75rem;line-height:1.2;color:var(--mocha);text-shadow:var(--letterpress)}
 .kicker{display:block;font-size:.7rem;letter-spacing:.34em;text-transform:uppercase;color:var(--gold);font-weight:400;margin-bottom:14px}
 p.lead{font-family:var(--serif);font-size:1.3rem;line-height:1.55;color:var(--ink);font-weight:400}
 p.body{font-size:.95rem;color:var(--ink-soft);max-width:34ch;margin:0 auto}
@@ -96,12 +109,13 @@ p.body{font-size:.95rem;color:var(--ink-soft);max-width:34ch;margin:0 auto}
 .ph svg{width:26px;height:26px;opacity:.55}
 
 /* Arch frame — the signature shape of this invitation */
-.arch-frame{border:1px solid var(--line);border-radius:var(--arch);padding:9px}
+.arch-frame{border-radius:var(--arch);padding:9px;background:var(--paper);box-shadow:var(--raised)}
 .arch-frame .photo{border-radius:var(--arch)}
 
-/* Gentle reveal */
-.reveal{opacity:0;transform:translateY(16px);transition:opacity 1.2s ease,transform 1.2s ease}
-.reveal.in{opacity:1;transform:none}
+/* Gentle reveal: rises out of a soft blur, like ink settling into paper */
+.reveal{opacity:0;transform:translateY(18px) scale(.985);filter:blur(6px);
+  transition:opacity 1.3s cubic-bezier(.2,.7,.2,1),transform 1.3s cubic-bezier(.2,.7,.2,1),filter 1.3s cubic-bezier(.2,.7,.2,1)}
+.reveal.in{opacity:1;transform:none;filter:none}
 
 /* Scroll progress line */
 .progress{position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:var(--col);height:2px;z-index:31;pointer-events:none}
@@ -121,57 +135,73 @@ p.body{font-size:.95rem;color:var(--ink-soft);max-width:34ch;margin:0 auto}
   content:"";position:absolute;inset:calc(14px + env(safe-area-inset-top,0px)) 14px calc(14px + env(safe-area-inset-bottom,0px));
   border:1px solid var(--line-soft);pointer-events:none;
 }
-.corner{position:absolute;width:150px;color:var(--gold);opacity:.55;pointer-events:none}
-.corner.tl{top:0;left:0}
-.corner.br{bottom:0;right:0;transform:rotate(180deg)}
-.opening-inner{text-align:center;max-width:360px;width:100%;position:relative;z-index:1}
-.dear{font-family:var(--serif);font-style:italic;font-size:1.25rem;color:var(--ink-soft);margin-bottom:6px;display:none}
-.dear.show{display:block}
-.invited{font-size:.76rem;letter-spacing:.44em;color:var(--gold);text-transform:uppercase;margin-bottom:36px}
-.opening .names{font-family:var(--serif);font-size:clamp(2.4rem,11vw,3rem);font-weight:300;color:var(--mocha);line-height:1.05;margin-top:40px}
-.opening .names em{font-style:italic;color:var(--gold);padding:0 .1em}
-.opening .date{font-size:.8rem;letter-spacing:.3em;text-transform:uppercase;color:var(--ink-soft);margin:14px 0 34px}
+.opening .bloom{width:min(48vw,230px);opacity:1;
+  transition:translate 1.3s cubic-bezier(.5,0,.2,1) .55s,opacity 1.1s ease .7s;
+  animation:bloomIn 1.6s cubic-bezier(.2,.7,.2,1) backwards}
+.opening .bloom.tl{top:0;left:0;--from:-14% -14%}
+.opening .bloom.tr{top:0;right:0;--from:14% -14%;animation-delay:.12s}
+.opening .bloom.bl{bottom:0;left:0;--from:-14% 14%;animation-delay:.24s}
+.opening .bloom.br{bottom:0;right:0;--from:14% 14%;animation-delay:.36s}
+@keyframes bloomIn{from{opacity:0;translate:var(--from);scale:.86}}
 
-.envelope{position:relative;width:264px;height:174px;margin:0 auto;perspective:900px}
-.env-back{position:absolute;inset:0;background:#E6DAC7;border-radius:3px;box-shadow:0 18px 36px rgba(110,88,72,.18)}
-.env-back::before{ /* patterned liner, visible once the flap opens */
-  content:"";position:absolute;left:0;right:0;top:0;height:60%;
-  clip-path:polygon(0 0,100% 0,50% 100%);
-  background:repeating-linear-gradient(45deg,#EFE4D2 0 6px,#E8DBC5 6px 12px);
+/* The invitation card: an embossed arch, the signature shape of this site */
+.opening-inner{
+  position:relative;z-index:2;text-align:center;width:min(330px,100%);
+  padding:70px 26px 34px;border-radius:180px 180px 8px 8px;
+  background:linear-gradient(170deg,#FFFEFB,var(--paper) 55%,#F6EFE3);box-shadow:var(--raised);
+  transition:opacity .9s ease .45s,transform 1.1s cubic-bezier(.5,0,.2,1) .45s,filter .9s ease .45s;
+  animation:cardIn 1.3s cubic-bezier(.2,.7,.2,1) .35s backwards;
 }
-.letter{
-  position:absolute;left:16px;right:16px;top:12px;height:150px;z-index:2;
-  background:var(--paper);border:1px solid var(--line);
-  display:flex;align-items:center;justify-content:center;flex-direction:column;
-  transition:transform 1.05s cubic-bezier(.3,.7,.2,1) .55s;
+.opening-inner::before{ /* pressed inner border */
+  content:"";position:absolute;inset:9px;border-radius:172px 172px 4px 4px;pointer-events:none;
+  border:1px solid var(--line-soft);box-shadow:inset 0 1px 0 #fff,0 1px 0 #fff;
 }
-.letter::before{content:"";position:absolute;inset:6px;border:1px solid var(--line-soft)}
-.letter .mono{font-family:var(--serif);font-size:2rem;color:var(--mocha);font-style:italic;font-weight:300}
-.letter small{font-size:.58rem;letter-spacing:.32em;color:var(--gold);margin-top:4px}
-.env-front{position:absolute;inset:0;z-index:3;background:#F1E8DA;border-radius:3px;clip-path:polygon(0 0,50% 56%,100% 0,100% 100%,0 100%)}
-.env-front::after{
-  content:"";position:absolute;inset:0;opacity:.8;
-  background:
-    linear-gradient(to top right,transparent calc(50% - .5px),var(--line) 50%,transparent calc(50% + .5px)) left bottom/50% 100% no-repeat,
-    linear-gradient(to top left,transparent calc(50% - .5px),var(--line) 50%,transparent calc(50% + .5px)) right bottom/50% 100% no-repeat;
-}
-.flap{
-  position:absolute;left:0;right:0;top:0;height:60%;z-index:4;background:var(--gold-soft);
-  clip-path:polygon(0 0,100% 0,50% 100%);transform-origin:top center;
-  transition:transform .8s ease,z-index 0s linear .38s;
-}
-.flap::before{content:"";position:absolute;inset:0;background:#E2D4BF;clip-path:polygon(1.5px 0,calc(100% - 1.5px) 0,50% calc(100% - 2.5px))}
+@keyframes cardIn{from{opacity:0;transform:translateY(18px);filter:blur(6px)}}
+
+.dear{font-family:var(--serif);font-style:italic;font-size:1.2rem;color:var(--ink-soft);margin-bottom:8px}
+.invited{font-size:.66rem;letter-spacing:.36em;color:var(--gold);text-transform:uppercase;line-height:1.9}
+.opening .names{font-family:var(--script);font-weight:400;font-size:clamp(2.9rem,13vw,3.5rem);color:var(--mocha);line-height:1.05;margin:18px 0 6px;text-shadow:var(--letterpress)}
+.opening .names span{display:block}
+.opening .names em{display:block;font-family:var(--serif);font-style:italic;font-weight:300;font-size:.5em;color:var(--gold);margin:2px 0}
+.opening .date{font-size:.74rem;letter-spacing:.42em;color:var(--ink-soft);margin:12px 0 30px;padding-left:.42em}
+
+/* Wax seal: tap to break */
 .seal{
-  position:absolute;left:50%;top:60%;z-index:5;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;
-  background:radial-gradient(circle at 35% 30%,#D6BE91,#A4885A 70%);
-  display:flex;align-items:center;justify-content:center;
-  font-family:var(--serif);font-style:italic;color:#FBF5EA;font-size:.95rem;
-  box-shadow:0 2px 6px rgba(110,88,72,.3),inset 0 0 0 3px rgba(255,255,255,.18);
-  transition:opacity .35s ease,transform .35s ease;
+  position:relative;width:86px;height:86px;margin:0 auto;border:0;padding:0;background:none;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;transition:transform .18s ease;
+  animation:sealIn .9s cubic-bezier(.3,1.5,.5,1) 1.15s backwards;
 }
-.opening.opened .seal{opacity:0;transform:scale(.6)}
-.opening.opened .flap{transform:rotateX(180deg);z-index:1}
-.opening.opened .letter{transform:translateY(-94px)}
+.seal:active{transform:scale(.94)}
+.seal:focus-visible{outline-offset:6px;border-radius:50%}
+.seal .half{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  border-radius:47% 53% 50% 50% / 52% 47% 53% 48%;
+  background:radial-gradient(circle at 34% 28%,#D5BC8E,#A98A5E 52%,#86694A 100%);
+  box-shadow:0 6px 14px -4px rgba(110,88,72,.55),inset 0 2px 2px rgba(255,255,255,.35),inset 0 -3px 5px rgba(60,40,25,.35);
+  font-family:var(--script);font-size:1.75rem;color:rgba(255,248,236,.92);
+  text-shadow:0 -1px 0 rgba(60,40,25,.45),0 1px 0 rgba(255,255,255,.25);
+  transition:transform .8s cubic-bezier(.3,.6,.3,1) .1s,opacity .6s ease .3s;
+}
+.seal .half::before{content:"";position:absolute;inset:9px;border-radius:50%;border:1px solid rgba(255,245,225,.35);box-shadow:inset 0 2px 3px rgba(60,40,25,.3)}
+.seal .half.l{clip-path:polygon(0 0,54% 0,46% 30%,58% 52%,47% 74%,53% 100%,0 100%)}
+.seal .half.r{clip-path:polygon(54% 0,100% 0,100% 100%,53% 100%,47% 74%,58% 52%,46% 30%)}
+.seal .ring{position:absolute;inset:-4px;border-radius:50%;border:1px solid var(--gold);opacity:0;animation:ping 2.6s ease-out 2.2s infinite}
+@keyframes ping{0%{transform:scale(.95);opacity:.55}100%{transform:scale(1.55);opacity:0}}
+@keyframes sealIn{from{opacity:0;transform:translateY(-10px) scale(1.25)}}
+.tap{font-size:.62rem;letter-spacing:.32em;text-transform:uppercase;color:var(--gold);margin-top:16px;animation:cardIn 1s ease 1.7s backwards}
+.opening .skip{position:absolute;z-index:3;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);margin:0}
+
+/* Opening sequence: seal cracks, the card lifts away, the flowers part */
+.opening.opened .seal .ring{animation:none;opacity:0}
+.opening.opened .seal .half.l{transform:translate(-22px,14px) rotate(-24deg);opacity:0}
+.opening.opened .seal .half.r{transform:translate(22px,16px) rotate(20deg);opacity:0}
+.opening.opened .opening-inner{opacity:0;transform:translateY(-26px) scale(1.04);filter:blur(5px)}
+.opening.opened .bloom{opacity:0}
+.opening.opened .bloom.tl{translate:-55% -55%}
+.opening.opened .bloom.tr{translate:55% -55%}
+.opening.opened .bloom.bl{translate:-55% 55%}
+.opening.opened .bloom.br{translate:55% 55%}
+.opening.opened .skip,.opening.opened .tap{opacity:0;transition:opacity .3s ease}
 
 /* =========================================================
    MENU
@@ -194,15 +224,42 @@ p.body{font-size:.95rem;color:var(--ink-soft);max-width:34ch;margin:0 auto}
 .nav .close{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));right:max(14px,calc(50% - var(--col)/2 + 14px));
   width:48px;height:48px;border:1px solid var(--line);border-radius:50%;background:none;font-size:1.4rem;color:var(--mocha);cursor:pointer;font-family:var(--serif)}
 
+
+/* Floating buttons: music (left) and back to top (right) */
+.float-btn{
+  position:fixed;z-index:30;bottom:calc(16px + env(safe-area-inset-bottom,0px));
+  width:46px;height:46px;border-radius:50%;border:1px solid var(--line);
+  background:rgba(253,250,244,.92);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  color:var(--mocha);font-family:var(--serif);font-size:1.15rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:opacity .4s ease,visibility .4s ease,background .3s ease;
+}
+.music-btn{left:max(14px,calc(50% - var(--col)/2 + 14px))}
+.music-btn.playing{background:var(--mocha);color:var(--paper);border-color:var(--mocha)}
+.top-btn{right:max(14px,calc(50% - var(--col)/2 + 14px));opacity:0;visibility:hidden}
+.top-btn.visible{opacity:1;visibility:visible}
+.top-btn svg{width:18px;height:18px}
+
 /* =========================================================
    2. ANNOUNCEMENT
    ========================================================= */
 .announce{padding-top:112px}
 .announce .together{font-family:var(--serif);font-style:italic;font-size:1.25rem;color:var(--ink-soft)}
-.announce .names{font-family:var(--serif);font-weight:300;color:var(--mocha);font-size:4rem;line-height:.95;margin:24px 0 10px}
-.announce .names em{display:block;font-style:italic;color:var(--gold);font-size:2.3rem;margin:8px 0}
-.announce .arch-frame{max-width:300px;margin:46px auto 0}
-.announce .photo{aspect-ratio:3/4}
+.announce .names{font-family:var(--script);font-weight:400;color:var(--mocha);font-size:4.1rem;line-height:1;margin:22px 0 12px}
+.announce .names em{display:block;font-family:var(--serif);font-style:italic;font-weight:300;color:var(--gold);font-size:2rem;margin:4px 0}
+.announce > .bloom{width:150px;top:0}
+.announce > .bloom.tl{left:0}
+.announce > .bloom.tr{right:0}
+
+/* Oval photo frame with a raised, beaded border */
+.oval-frame{position:relative;width:min(272px,80%);aspect-ratio:3/4;margin:60px auto 0;padding:16px;border-radius:50%;
+  background:linear-gradient(160deg,#FFFEFB,#F4ECDF);box-shadow:var(--raised)}
+.oval-frame .photo{width:100%;height:100%;border-radius:50%}
+.oval-frame .photo::after{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;
+  box-shadow:inset 0 3px 10px rgba(60,40,25,.28),inset 0 0 0 1px rgba(180,154,106,.35)}
+.oval-frame .beads{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.oval-frame .sprig{position:absolute;left:50%;width:170px;pointer-events:none;overflow:visible}
+.oval-frame .sprig.top{top:0;transform:translate(-50%,-48%) scale(.8)}
+.oval-frame .sprig.bottom{bottom:0;transform:translate(-50%,46%)}
 .datebar{display:flex;align-items:center;justify-content:center;gap:18px;margin-top:44px;font-family:var(--serif);color:var(--mocha)}
 .datebar .side{font-size:.72rem;letter-spacing:.26em;text-transform:uppercase;font-family:var(--sans);color:var(--ink-soft);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:7px 0;width:96px}
 .datebar .day{font-size:3.2rem;line-height:1;font-weight:300}
@@ -213,18 +270,17 @@ p.body{font-size:.95rem;color:var(--ink-soft);max-width:34ch;margin:0 auto}
    ========================================================= */
 .countdown{background:var(--ivory)}
 .timer{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:36px}
-.timer div{border:1px solid var(--line);border-radius:var(--arch);padding:22px 0 14px;background:var(--paper)}
+.timer div{border-radius:var(--arch);padding:22px 0 14px;background:linear-gradient(170deg,#FFFEFB,var(--paper));box-shadow:var(--raised)}
 .timer b{display:block;font-family:var(--serif);font-weight:300;font-size:2.2rem;line-height:1;color:var(--mocha);font-variant-numeric:lining-nums tabular-nums}
 .timer span{display:block;margin-top:6px;font-size:.58rem;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-soft)}
-.timer-done{font-family:var(--serif);font-size:1.7rem;color:var(--mocha);margin-top:30px;display:none}
-.countdown .cal{margin-top:30px;display:flex;justify-content:center;gap:22px;flex-wrap:wrap}
+.timer-done{font-family:var(--serif);font-size:1.7rem;color:var(--mocha);margin-top:30px}
 
 /* =========================================================
    4. DETAILS
    ========================================================= */
 .cards{display:grid;gap:18px;margin:40px 0 36px}
-.card{border:1px solid var(--line);padding:34px 22px 30px;background:var(--paper);position:relative}
-.card::before{content:"";position:absolute;inset:5px;border:1px solid var(--line-soft);pointer-events:none}
+.card{padding:34px 22px 30px;background:linear-gradient(170deg,#FFFEFB,var(--paper));position:relative;border-radius:4px;box-shadow:var(--raised)}
+.card::before{content:"";position:absolute;inset:8px;border:1px solid var(--line-soft);pointer-events:none;box-shadow:inset 0 1px 0 #fff,0 1px 0 #fff}
 .card svg{width:34px;height:34px;color:var(--gold);margin:0 auto 14px;display:block}
 .card h3{font-size:.74rem;letter-spacing:.36em;font-weight:400;color:var(--gold);text-transform:uppercase}
 .card .time{font-family:var(--serif);font-weight:300;font-size:2.4rem;color:var(--mocha);margin:10px 0 8px;line-height:1}
@@ -285,9 +341,12 @@ p.body{font-size:.95rem;color:var(--ink-soft);max-width:34ch;margin:0 auto}
 /* =========================================================
    9. RSVP
    ========================================================= */
-.rsvp-card{border:1px solid var(--line);padding:40px 22px 30px;position:relative;background:var(--paper)}
-.rsvp-card::before{content:"";position:absolute;inset:5px;border:1px solid var(--line-soft);pointer-events:none}
-.rsvp h2{font-size:1.85rem}
+.rsvp-card{padding:56px 22px 34px;position:relative;background:linear-gradient(170deg,#FFFEFB,var(--paper));border-radius:4px;box-shadow:var(--raised)}
+.rsvp-card::before{content:"";position:absolute;inset:8px;border:1px solid var(--line-soft);pointer-events:none;box-shadow:inset 0 1px 0 #fff,0 1px 0 #fff}
+.rsvp-card > .bloom{width:110px}
+.rsvp-card > .bloom.tl{top:-14px;left:-14px}
+.rsvp-card > .bloom.br{bottom:-14px;right:-14px}
+.rsvp h2{font-size:2.3rem}
 .rsvp .by{font-family:var(--serif);font-style:italic;color:var(--ink-soft);font-size:1.1rem;margin-top:10px}
 form{text-align:left;margin-top:30px;position:relative}
 .field{margin-bottom:22px}
@@ -311,14 +370,14 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--mocha)}
 .choice input:focus-visible + span{outline:2px solid var(--gold);outline-offset:3px}
 form .btn{width:100%;margin-top:8px}
 .form-status{margin-top:16px;text-align:center;font-size:.9rem;color:#9A5B4A;min-height:1.4em}
-.thanks{display:none;padding:20px 0 6px}
+.thanks{padding:20px 0 6px}
 .thanks .lead{margin-top:6px}
 
 /* =========================================================
    10. LOCATION
    ========================================================= */
 .map{margin:38px 0 30px;border:1px solid var(--line);padding:8px;background:var(--paper)}
-.map svg{width:100%;height:auto;display:block}
+.map .photo{aspect-ratio:3/2}
 .address{font-family:var(--serif);font-size:1.4rem;color:var(--mocha)}
 .address + p{font-size:.92rem;color:var(--ink-soft);margin-bottom:28px}
 
@@ -329,7 +388,7 @@ form .btn{width:100%;margin-top:8px}
 .closing .sprig{width:140px;margin:0 auto 30px;color:var(--gold-soft);display:block}
 .closing p.lead{color:#F3EADC}
 .closing .with{font-family:var(--serif);font-style:italic;font-size:1.15rem;color:var(--gold-soft);margin-top:34px}
-.closing .names{font-family:var(--serif);font-weight:300;font-size:2.8rem;color:#FBF5EA;margin-top:4px}
+.closing .names{font-family:var(--script);font-weight:400;font-size:3.2rem;color:#FBF5EA;margin-top:4px}
 .closing .heart{width:26px;height:26px;color:var(--gold-soft);margin:26px auto 0;display:block}
 .closing .foot{margin-top:56px;font-size:.64rem;letter-spacing:.34em;color:rgba(243,234,220,.6);text-transform:uppercase}
 .closing .ornament{color:var(--gold-soft)}
@@ -343,52 +402,114 @@ form .btn{width:100%;margin-top:8px}
 }
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
-  .reveal{opacity:1;transform:none;transition:none}
-  .flap,.letter,.seal,.opening{transition:none}
+  .reveal{opacity:1;transform:none;filter:none;transition:none}
+  .opening,.opening *{animation:none !important;transition:none !important}
 }
 </style>
 </head>
 <body class="locked">
 
-<!-- Reusable floral corner -->
-<svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <symbol id="branch" viewBox="0 0 150 150" fill="none" stroke="currentColor" stroke-width=".9">
-    <path d="M0 18 C40 22 80 40 112 80 C126 98 134 118 138 146"/>
-    <path d="M30 22 C30 10 40 2 50 2 C48 12 40 20 30 22Z"/>
-    <path d="M38 26 C30 36 18 38 10 34 C16 26 28 24 38 26Z"/>
-    <path d="M62 34 C66 22 78 16 88 18 C84 28 74 34 62 34Z"/>
-    <path d="M72 44 C66 56 54 60 44 58 C50 48 62 44 72 44Z"/>
-    <path d="M94 58 C100 48 112 44 120 48 C114 58 104 62 94 58Z"/>
-    <path d="M104 72 C100 84 90 90 80 90 C84 80 94 74 104 72Z"/>
-    <path d="M122 96 C130 88 142 88 148 94 C140 102 130 102 122 96Z"/>
-    <circle cx="20" cy="12" r="2.4"/><circle cx="76" cy="24" r="1.8"/><circle cx="128" cy="78" r="2.2"/>
-  </symbol>
+<!-- Embossed paper flowers, reused across the page.
+     Each petal and leaf casts its own soft shadow, which gives the sculpted, raised look. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="paperGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/><stop offset=".6" stop-color="#FAF5EC"/><stop offset="1" stop-color="#EDE3D3"/>
+    </linearGradient>
+    <filter id="emb" x="-30%" y="-30%" width="160%" height="160%" color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="1.1" result="blur"/>
+      <feOffset in="blur" dx="1.1" dy="1.6" result="drop"/>
+      <feFlood flood-color="#6E5848" flood-opacity=".30"/>
+      <feComposite in2="drop" operator="in" result="shadow"/>
+      <feMerge><feMergeNode in="shadow"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+
+    <g id="leaf">
+      <path d="M0 0C8-10 26-12 42 0 26 12 8 10 0 0Z" fill="url(#paperGrad)" filter="url(#emb)"/>
+      <path d="M3 0C15-1 28-1 39 0" fill="none" stroke="#B49A6A" stroke-opacity=".32" stroke-width=".7"/>
+    </g>
+
+    <g id="rose">
+      <g fill="url(#paperGrad)" filter="url(#emb)">
+        <path d="M0-27C11-27 22-19 25-8 28 5 20 20 6 25-9 29-23 20-26 6-29-8-20-24 0-27Z"/>
+        <path d="M-2-20C9-22 19-13 19-2 19 10 10 18-1 18-12 18-20 9-19-2-18-12-11-19-2-20Z"/>
+        <path d="M2-14C10-13 14-6 13 1 12 9 5 13-2 12-9 11-14 5-13-2-12-9-5-14 2-14Z"/>
+        <path d="M-1-8C5-9 9-4 8 1 7 6 3 8-2 7-6 6-8 2-7-2-6-6-4-8-1-8Z"/>
+        <path d="M1-3C4-3 5 0 4 2 3 4 0 4-2 3-3 1-2-2 1-3Z"/>
+      </g>
+      <g fill="none" stroke="#B49A6A" stroke-opacity=".28" stroke-width=".6">
+        <path d="M-19-2C-14 7-5 10 3 8"/><path d="M13 1C12-8 6-12-3-12"/><path d="M-21 9C-14 19 0 21 12 16"/>
+      </g>
+    </g>
+
+    <g id="bud">
+      <path d="M0-9C5-9 8-4 7 2 6 7 2 9 0 9-2 9-6 7-7 2-8-4-5-9 0-9Z" fill="url(#paperGrad)" filter="url(#emb)"/>
+      <path d="M-4-4C-1 0 1 0 4-4" fill="none" stroke="#B49A6A" stroke-opacity=".3" stroke-width=".6"/>
+    </g>
+
+    <!-- Corner cluster, anchored at the top-left (0,0) -->
+    <g id="bouquet">
+      <use href="#leaf" transform="translate(150 10) rotate(-8) scale(1.1)"/>
+      <use href="#leaf" transform="translate(10 150) rotate(98) scale(1.1)"/>
+      <use href="#leaf" transform="translate(52 30) rotate(-12) scale(1.6)"/>
+      <use href="#leaf" transform="translate(30 52) rotate(102) scale(1.6)"/>
+      <use href="#leaf" transform="translate(62 62) rotate(45) scale(1.35)"/>
+      <use href="#leaf" transform="translate(96 40) rotate(20) scale(1)"/>
+      <use href="#leaf" transform="translate(40 96) rotate(70) scale(1)"/>
+      <use href="#bud" transform="translate(178 14) rotate(80)"/>
+      <use href="#bud" transform="translate(14 178) rotate(10)"/>
+      <use href="#rose" transform="translate(120 22) scale(.78)"/>
+      <use href="#rose" transform="translate(22 120) scale(.78)"/>
+      <use href="#rose" transform="translate(84 84) scale(.62)"/>
+      <use href="#rose" transform="translate(42 42) scale(1.3)"/>
+    </g>
+
+    <!-- Horizontal sprig, centred on (0,0) -->
+    <g id="sprig">
+      <use href="#leaf" transform="rotate(180) translate(10 0) scale(1.5)"/>
+      <use href="#leaf" transform="translate(10 0) scale(1.5)"/>
+      <use href="#leaf" transform="rotate(205) translate(20 0) scale(1.05)"/>
+      <use href="#leaf" transform="rotate(-25) translate(20 0) scale(1.05)"/>
+      <use href="#bud" transform="translate(-58 -6) rotate(-70)"/>
+      <use href="#bud" transform="translate(58 -6) rotate(70)"/>
+      <use href="#rose" transform="translate(-24 4) scale(.55)"/>
+      <use href="#rose" transform="translate(24 4) scale(.55)"/>
+      <use href="#rose" transform="scale(.82)"/>
+    </g>
+  </defs>
 </svg>
 
 <!-- 1. OPENING -->
-<div class="opening" id="opening" role="dialog" aria-label="Wedding invitation">
-  <svg class="corner tl" aria-hidden="true"><use href="#branch"/></svg>
-  <svg class="corner br" aria-hidden="true"><use href="#branch"/></svg>
+<div class="opening" id="opening" role="dialog" aria-modal="true" aria-label="Wedding invitation">
+  <svg class="bloom tl" viewBox="0 0 200 200" aria-hidden="true"><use href="#bouquet"/></svg>
+  <svg class="bloom tr" viewBox="0 0 200 200" aria-hidden="true"><use href="#bouquet"/></svg>
+  <svg class="bloom bl" viewBox="0 0 200 200" aria-hidden="true"><use href="#bouquet"/></svg>
+  <svg class="bloom br" viewBox="0 0 200 200" aria-hidden="true"><use href="#bouquet"/></svg>
+
   <div class="opening-inner">
-    <p class="dear" id="dear"></p>
-    <p class="invited">You are invited</p>
-    <div class="envelope" aria-hidden="true">
-      <div class="env-back"></div>
-      <div class="letter"><span class="mono">C &amp; R</span><small>12 · 12 · 27</small></div>
-      <div class="env-front"></div>
-      <div class="flap"></div>
-      <div class="seal">C&amp;R</div>
-    </div>
-    <h1 class="names">Carl <em>&amp;</em> Rocelle</h1>
-    <p class="date">December 12, 2027</p>
-    <button class="btn solid" id="openBtn" type="button">Open Invitation</button>
+    <p class="dear" id="dear" hidden></p>
+    <p class="invited">You are invited<br>to the wedding of</p>
+    <h1 class="names"><span>Carl</span><em>&amp;</em><span>Rocelle</span></h1>
+    <p class="date">12 · 12 · 2027</p>
+    <button class="seal" id="openBtn" type="button" aria-label="Open invitation">
+      <span class="ring" aria-hidden="true"></span>
+      <span class="half l" aria-hidden="true">C&amp;R</span>
+      <span class="half r" aria-hidden="true">C&amp;R</span>
+    </button>
+    <p class="tap" aria-hidden="true">Tap the seal to open</p>
   </div>
+  <button class="textlink skip" id="skipBtn" type="button">Skip intro</button>
 </div>
+
+<!-- Background music: upload a file named music.mp3 next to index.html. If it's missing, the button hides itself. -->
+<audio id="weddingMusic" src="music.mp3" loop preload="none"></audio>
+<button class="float-btn music-btn" id="musicBtn" type="button" aria-label="Play background music" aria-pressed="false">♫</button>
+<button class="float-btn top-btn" id="topBtn" type="button" aria-label="Back to top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 19V5M6 11l6-6 6 6"/></svg></button>
 
 <div class="progress" aria-hidden="true"><i id="progress"></i></div>
 
 <button class="menu-btn" id="menuBtn" type="button" aria-label="Open menu" aria-controls="nav" aria-expanded="false"><span></span></button>
-<nav class="nav" id="nav" aria-label="Sections">
+<nav class="nav" id="nav" aria-label="Sections" aria-hidden="true" inert>
   <button class="close" id="navClose" type="button" aria-label="Close menu">×</button>
   <ul>
     <li><a href="#announcement">Invitation</a></li>
@@ -406,15 +527,22 @@ form .btn{width:100%;margin-top:8px}
 
   <!-- 2. ANNOUNCEMENT -->
   <section class="announce" id="announcement">
+    <svg class="bloom tl" viewBox="0 0 200 200" aria-hidden="true"><use href="#bouquet"/></svg>
+    <svg class="bloom tr" viewBox="0 0 200 200" aria-hidden="true"><use href="#bouquet"/></svg>
     <p class="together reveal">Together with our families,</p>
     <h2 class="names reveal">Carl<em>&amp;</em>Rocelle</h2>
     <p class="lead reveal">joyfully invite you to celebrate their wedding.</p>
 
-    <div class="arch-frame reveal">
+    <div class="oval-frame reveal">
       <div class="photo">
-        <!-- Replace with: <img src="photos/couple.jpg" alt="Carl and Rocelle"> -->
-        <div class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="5" width="18" height="14" rx="1"/><circle cx="9" cy="11" r="2"/><path d="M21 17l-6-6-8 8"/></svg>Your photo here</div>
+        <img src="photos/couple.jpg" alt="Two gold wedding rings" width="4000" height="2500" decoding="async">
       </div>
+      <svg class="beads" viewBox="0 0 300 400" aria-hidden="true">
+        <ellipse cx="150" cy="200" rx="142" ry="192" fill="none" stroke="#B49A6A" stroke-opacity=".55" stroke-width="2.6" stroke-linecap="round" stroke-dasharray="0 8.5"/>
+        <ellipse cx="150" cy="200" rx="148.5" ry="198.5" fill="none" stroke="#B49A6A" stroke-opacity=".3" stroke-width=".8"/>
+      </svg>
+      <svg class="sprig top" viewBox="-85 -35 170 70" aria-hidden="true"><use href="#sprig"/></svg>
+      <svg class="sprig bottom" viewBox="-85 -35 170 70" aria-hidden="true"><use href="#sprig"/></svg>
     </div>
 
     <div class="datebar reveal">
@@ -434,8 +562,7 @@ form .btn{width:100%;margin-top:8px}
       <div><b id="cd-m">00</b><span>Minutes</span></div>
       <div><b id="cd-s">00</b><span>Seconds</span></div>
     </div>
-    <p class="timer-done" id="timerDone">Today’s the day.</p>
-  
+    <p class="timer-done" id="timerDone" hidden>Today’s the day.</p>
   </section>
 
   <!-- 4. DETAILS -->
@@ -474,19 +601,19 @@ form .btn{width:100%;margin-top:8px}
         <span class="year">[Year]</span>
         <h3>The day we met</h3>
         <p>An ordinary afternoon that turned out to be anything but.</p>
-        <div class="photo"><!-- <img src="photos/story-1.jpg" alt=""> --><div class="ph">Photo</div></div>
+        <div class="photo"><img src="photos/story-1.jpg" alt="The day we met" width="1170" height="1920" loading="lazy" decoding="async"></div>
       </li>
       <li class="reveal">
         <span class="year">[Year]</span>
         <h3>Our first adventure</h3>
         <p>Late-night drives, new cities, and learning that home is a person.</p>
-        <div class="photo"><!-- <img src="photos/story-2.jpg" alt=""> --><div class="ph">Photo</div></div>
+        <div class="photo"><img src="photos/story-2.jpg" alt="Our first adventure" width="1278" height="1920" loading="lazy" decoding="async"></div>
       </li>
       <li class="reveal">
         <span class="year">[Year]</span>
         <h3>The proposal</h3>
         <p>One question, one answer, and the start of our next chapter.</p>
-        <div class="photo"><!-- <img src="photos/story-3.jpg" alt=""> --><div class="ph">Photo</div></div>
+        <div class="photo"><img src="photos/story-3.jpg" alt="Bride and groom walking hand in hand by a sunflower field" width="1920" height="1288" loading="lazy" decoding="async"></div>
       </li>
     </ol>
     <p class="signature">and now, forever</p>
@@ -542,11 +669,11 @@ form .btn{width:100%;margin-top:8px}
 
     <div class="outfits">
       <figure class="reveal">
-        <div class="arch-frame"><div class="photo"><!-- <img src="photos/attire-1.jpg" alt="Sample gown"> --><div class="ph">Gown idea</div></div></div>
+        <div class="arch-frame"><div class="photo"><img src="photos/attire-1.jpg" alt="Sample gown in earth tones" width="310" height="531" loading="lazy" decoding="async"></div></div>
         <figcaption>For her</figcaption>
       </figure>
       <figure class="reveal">
-        <div class="arch-frame"><div class="photo"><!-- <img src="photos/attire-2.jpg" alt="Sample suit"> --><div class="ph">Suit idea</div></div></div>
+        <div class="arch-frame"><div class="photo"><img src="photos/attire-2.jpg" alt="Sample suit in earth tones" width="464" height="959" loading="lazy" decoding="async"></div></div>
         <figcaption>For him</figcaption>
       </figure>
     </div>
@@ -575,6 +702,8 @@ form .btn{width:100%;margin-top:8px}
   <!-- 9. RSVP -->
   <section class="rsvp" id="rsvp">
     <div class="rsvp-card reveal">
+      <svg class="bloom tl" viewBox="0 0 200 200" aria-hidden="true"><use href="#bouquet"/></svg>
+      <svg class="bloom br" viewBox="0 0 200 200" aria-hidden="true"><use href="#bouquet"/></svg>
       <span class="kicker">RSVP</span>
       <h2>Kindly Confirm Your Attendance</h2>
       <p class="by">Please reply by November 12, 2027</p>
@@ -591,6 +720,7 @@ form .btn{width:100%;margin-top:8px}
             <label class="choice"><input type="radio" name="attending" value="No"><span>Regretfully declines</span></label>
           </div>
         </div>
+        <div id="attendingFields" hidden>
         <div class="field">
           <label for="f-count">Number of attendees</label>
           <select id="f-count" name="count"><option>1</option><option>2</option><option>3</option><option>4</option></select>
@@ -598,6 +728,7 @@ form .btn{width:100%;margin-top:8px}
         <div class="field">
           <label for="f-meal">Meal preference <span class="opt">(optional)</span></label>
           <select id="f-meal" name="meal"><option value="">No preference</option><option>Beef</option><option>Fish</option><option>Chicken</option><option>Vegetarian</option></select>
+        </div>
         </div>
         <div class="field">
           <label for="f-msg">Message to the couple <span class="opt">(optional)</span></label>
@@ -607,7 +738,7 @@ form .btn{width:100%;margin-top:8px}
         <p class="form-status" id="formStatus" role="status"></p>
       </form>
 
-      <div class="thanks" id="thanks" role="status">
+      <div class="thanks" id="thanks" role="status" hidden>
         <div class="ornament"><i></i></div>
         <p class="lead">Thank you. Your RSVP has been sent.</p>
         <p class="body" style="margin-top:8px">We can’t wait to celebrate with you.</p>
@@ -620,16 +751,7 @@ form .btn{width:100%;margin-top:8px}
     <span class="kicker">Getting there</span>
     <h2>Location &amp; Directions</h2>
     <div class="map reveal">
-      <!-- Map placeholder. You can swap this for a Google Maps embed iframe. -->
-      <svg viewBox="0 0 320 200" role="img" aria-label="Map placeholder">
-        <rect width="320" height="200" fill="#F3ECDF"/>
-        <path d="M0 140 C80 120 120 160 200 130 S300 90 320 100" fill="none" stroke="#DCCDB4" stroke-width="14"/>
-        <path d="M60 0 L90 200 M210 0 L180 200 M0 60 L320 80" stroke="#E6DAC6" stroke-width="6"/>
-        <path d="M0 30 L320 40 M140 0 L150 200" stroke="#EDE3D3" stroke-width="3"/>
-        <rect x="220" y="140" width="60" height="40" fill="#E2D8C2"/>
-        <circle cx="158" cy="62" r="22" fill="none" stroke="#B49A6A" stroke-width=".8" opacity=".6"/>
-        <g transform="translate(158 72)"><path d="M0 0 C-12 -14 -12 -30 0 -32 C12 -30 12 -14 0 0Z" fill="#6E5848"/><circle cy="-21" r="4.5" fill="#FDFAF4"/></g>
-      </svg>
+      <div class="photo"><img src="photos/venue.jpg" alt="Reception table with flower centerpieces at the venue" width="1920" height="1278" loading="lazy" decoding="async"></div>
     </div>
     <p class="address">The Grand Garden</p>
     <p>[Street address], Manila, Philippines</p>
@@ -655,9 +777,9 @@ form .btn{width:100%;margin-top:8px}
 </main>
 
 <script>
-/* =========================================================
-   CONFIG — edit links, date, venue and RSVP here
-   ========================================================= */
+/* ==========================================
+   CARL & ROCELLE — WEBSITE CONFIGURATION
+   ========================================== */
 const CONFIG = {
   couple: "Carl & Rocelle",
   weddingStart: "2027-12-12T15:00:00+08:00",   // ceremony, Manila time
@@ -667,7 +789,6 @@ const CONFIG = {
   // Paste your real Google Maps share link here
   mapsUrl: "https://www.google.com/maps/search/?api=1&query=The+Grand+Garden+Manila+Philippines",
 
-  // RSVP via Google Forms. Leave formId empty until ready.
   rsvp: {
     formId: "1FAIpQLSda5zYJ2r_f7pXSqGbBz7Hz5IsF9OU7zjVOY14vj_Cw3L7lAQ",
     entries: {
@@ -681,111 +802,217 @@ const CONFIG = {
 };
 
 const $ = id => document.getElementById(id);
-const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+// Safe listener: a missing element never breaks the rest of the page
+const on = (id, type, fn) => { const el = $(id); if (el) el.addEventListener(type, fn); };
+const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-/* ---------- Personal greeting: yoursite.com/?to=Maria%20Santos ---------- */
-const guest = new URLSearchParams(location.search).get('to');
-if (guest){
+
+/* ==========================================
+   PERSONALIZED GUEST GREETING  (?to=Maria%20Santos)
+   ========================================== */
+const guest = new URLSearchParams(location.search).get("to");
+if (guest) {
   const name = guest.trim().slice(0, 60);
-  $('dear').textContent = `Dear ${name},`;
-  $('dear').classList.add('show');
-  $('f-name').value = name;
+  if (name && $("dear")) {
+    $("dear").textContent = `Dear ${name},`;
+    $("dear").hidden = false;
+    if ($("f-name")) $("f-name").value = name;
+  }
 }
 
-/* ---------- Opening envelope ---------- */
-$('openBtn').addEventListener('click', () => {
-  $('opening').classList.add('opened');
-  setTimeout(() => {
-    $('opening').classList.add('done');
-    document.body.classList.remove('locked');
-  }, reduce ? 50 : 2000);
-});
 
-/* ---------- Menu ---------- */
-const nav = $('nav'), menuBtn = $('menuBtn');
-function setNav(open){
-  nav.classList.toggle('open', open);
-  menuBtn.setAttribute('aria-expanded', open);
-  document.body.classList.toggle('locked', open);
+/* ==========================================
+   BACKGROUND MUSIC
+   ========================================== */
+const music = $("weddingMusic");
+const musicBtn = $("musicBtn");
+
+function setMusicUI(playing) {
+  if (!musicBtn) return;
+  musicBtn.classList.toggle("playing", playing);
+  musicBtn.textContent = playing ? "Ⅱ" : "♫";
+  musicBtn.setAttribute("aria-pressed", String(playing));
+  musicBtn.setAttribute("aria-label", playing ? "Pause background music" : "Play background music");
 }
-menuBtn.addEventListener('click', () => setNav(true));
-$('navClose').addEventListener('click', () => setNav(false));
-nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => setNav(false)));
-document.addEventListener('keydown', e => { if (e.key === 'Escape') setNav(false); });
 
-/* ---------- Scroll progress ---------- */
-addEventListener('scroll', () => {
-  const max = document.documentElement.scrollHeight - innerHeight;
-  $('progress').style.width = (max > 0 ? scrollY / max * 100 : 0) + '%';
-}, { passive:true });
+function playMusic() {
+  if (!music) return;
+  music.volume = 0.35;                       // ignored on iPhone; lower the file's volume instead
+  music.play().catch(() => {
+    if (music.error && musicBtn) musicBtn.hidden = true;   // no music.mp3 uploaded
+  });
+}
 
-/* ---------- Map links ---------- */
-document.querySelectorAll('.js-map').forEach(a => a.href = CONFIG.mapsUrl);
+if (music && musicBtn) {
+  music.addEventListener("play",  () => setMusicUI(true));
+  music.addEventListener("pause", () => setMusicUI(false));
+  music.addEventListener("error", () => { musicBtn.hidden = true; });
+  musicBtn.addEventListener("click", () => music.paused ? playMusic() : music.pause());
+}
 
-/* ---------- Calendar ---------- */
-const toUTC = d => new Date(d).toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,'');
-const start = toUTC(CONFIG.weddingStart), end = toUTC(CONFIG.weddingEnd);
-const title = `${CONFIG.couple} Wedding`;
-$('gcal').href = 'https://calendar.google.com/calendar/render?action=TEMPLATE'
-  + '&text=' + encodeURIComponent(title)
-  + '&dates=' + start + '/' + end
-  + '&location=' + encodeURIComponent(CONFIG.venue)
-  + '&details=' + encodeURIComponent(location.href.split('?')[0]);
-$('ics').addEventListener('click', () => {
-  const ics = [
-    'BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Wedding Invitation//EN','BEGIN:VEVENT',
-    'UID:' + start + '@wedding-invitation','DTSTAMP:' + toUTC(new Date()),
-    'DTSTART:' + start,'DTEND:' + end,'SUMMARY:' + title,'LOCATION:' + CONFIG.venue.replace(/,/g,'\\,'),
-    'END:VEVENT','END:VCALENDAR'
-  ].join('\r\n');
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([ics], { type:'text/calendar' }));
-  a.download = 'wedding.ics';
-  document.body.appendChild(a); a.click(); a.remove();
+
+/* ==========================================
+   OPENING ENVELOPE
+   ========================================== */
+let invitationOpened = false;
+
+function openInvitation(instant) {
+  if (invitationOpened) return;
+  invitationOpened = true;
+  playMusic();                               // allowed because the guest just tapped
+  $("opening").classList.add("opened");
+
+  const finish = () => {
+    $("opening").classList.add("done");
+    document.body.classList.remove("locked");
+  };
+  (instant || reducedMotion) ? finish() : setTimeout(finish, 1900);
+}
+
+on("openBtn", "click", () => openInvitation(false));
+on("skipBtn", "click", () => openInvitation(true));
+
+
+/* ==========================================
+   NAVIGATION
+   ========================================== */
+const nav = $("nav");
+const menuBtn = $("menuBtn");
+
+function setNav(open) {
+  if (!nav || !menuBtn) return;
+  nav.classList.toggle("open", open);
+  nav.setAttribute("aria-hidden", String(!open));
+  nav.inert = !open;
+  menuBtn.setAttribute("aria-expanded", String(open));
+  document.body.classList.toggle("locked", open || !invitationOpened);
+  if (open) $("navClose").focus(); else menuBtn.focus({ preventScroll: true });
+}
+
+on("menuBtn", "click", () => setNav(true));
+on("navClose", "click", () => setNav(false));
+if (nav) nav.querySelectorAll("a").forEach(a => a.addEventListener("click", () => setNav(false)));
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape" && nav && nav.classList.contains("open")) setNav(false);
 });
 
-/* ---------- Countdown ---------- */
-const target = new Date(CONFIG.weddingStart).getTime();
-const pad = n => String(n).padStart(2,'0');
-(function tick(){
-  const diff = target - Date.now();
-  if (diff <= 0){ $('timer').style.display = 'none'; $('timerDone').style.display = 'block'; return; }
-  $('cd-d').textContent = Math.floor(diff / 864e5);
-  $('cd-h').textContent = pad(Math.floor(diff / 36e5) % 24);
-  $('cd-m').textContent = pad(Math.floor(diff / 6e4) % 60);
-  $('cd-s').textContent = pad(Math.floor(diff / 1e3) % 60);
-  setTimeout(tick, 1000);
-})();
 
-/* ---------- Scroll reveals ---------- */
-if ('IntersectionObserver' in window && !reduce){
-  const io = new IntersectionObserver(es => es.forEach(e => {
-    if (e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
-  }), { threshold:.15 });
-  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+/* ==========================================
+   SCROLL PROGRESS + BACK TO TOP
+   ========================================== */
+function updateScroll() {
+  const max = document.documentElement.scrollHeight - window.innerHeight;
+  if ($("progress")) $("progress").style.width = (max > 0 ? window.scrollY / max * 100 : 0) + "%";
+  if ($("topBtn")) $("topBtn").classList.toggle("visible", window.scrollY > 500);
+}
+window.addEventListener("scroll", updateScroll, { passive: true });
+window.addEventListener("load", updateScroll);
+on("topBtn", "click", () => window.scrollTo({ top: 0, behavior: reducedMotion ? "auto" : "smooth" }));
+
+
+/* ==========================================
+   GOOGLE MAPS
+   ========================================== */
+document.querySelectorAll(".js-map").forEach(link => { link.href = CONFIG.mapsUrl; });
+
+
+/* ==========================================
+   LIVE COUNTDOWN (Manila time)
+   ========================================== */
+const weddingTarget = new Date(CONFIG.weddingStart).getTime();
+const pad = n => String(n).padStart(2, "0");
+let countdownId;
+
+function updateCountdown() {
+  const diff = weddingTarget - Date.now();
+  if (diff <= 0) {
+    if ($("timer")) $("timer").hidden = true;
+    if ($("timerDone")) $("timerDone").hidden = false;
+    clearInterval(countdownId);
+    return;
+  }
+  $("cd-d").textContent = Math.floor(diff / 86400000);
+  $("cd-h").textContent = pad(Math.floor(diff / 3600000) % 24);
+  $("cd-m").textContent = pad(Math.floor(diff / 60000) % 60);
+  $("cd-s").textContent = pad(Math.floor(diff / 1000) % 60);
+}
+if ($("cd-d")) { updateCountdown(); countdownId = setInterval(updateCountdown, 1000); }
+
+
+/* ==========================================
+   SCROLL REVEAL
+   ========================================== */
+const reveals = document.querySelectorAll(".reveal");
+if ("IntersectionObserver" in window && !reducedMotion) {
+  const observer = new IntersectionObserver(entries => entries.forEach(entry => {
+    if (entry.isIntersecting) { entry.target.classList.add("in"); observer.unobserve(entry.target); }
+  }), { threshold: 0.12 });
+  reveals.forEach(el => observer.observe(el));
 } else {
-  document.querySelectorAll('.reveal').forEach(el => el.classList.add('in'));
+  reveals.forEach(el => el.classList.add("in"));
 }
 
-/* ---------- RSVP ---------- */
-$('rsvpForm').addEventListener('submit', async e => {
-  e.preventDefault();
-  const status = $('formStatus'); status.textContent = '';
-  const data = new FormData(e.target);
-  if (!data.get('name').trim()){ status.textContent = 'Please enter your full name.'; return; }
-  if (!data.get('attending')){ status.textContent = 'Please let us know if you can attend.'; return; }
-  if (!CONFIG.rsvp.formId){ status.textContent = 'RSVP isn’t connected yet. Add your Google Form ID in the CONFIG section of the code.'; return; }
+
+/* ==========================================
+   RSVP — show attendee & meal only when attending
+   ========================================== */
+function updateAttendanceFields() {
+  const box = $("attendingFields");
+  if (!box) return;
+  const answer = document.querySelector('input[name="attending"]:checked');
+  const attending = !!answer && answer.value === "Yes";
+  box.hidden = !attending;
+  if (!attending) { $("f-count").value = "1"; $("f-meal").value = ""; }
+}
+document.querySelectorAll('input[name="attending"]').forEach(input =>
+  input.addEventListener("change", updateAttendanceFields));
+updateAttendanceFields();
+
+
+/* ==========================================
+   RSVP SUBMISSION (Google Forms)
+   Google doesn't confirm no-cors submissions, so test
+   both "accept" and "decline" and check your Responses tab.
+   ========================================== */
+on("rsvpForm", "submit", async event => {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const status = $("formStatus");
+  const button = $("submitBtn");
+  status.textContent = "";
+
+  const data = new FormData(form);
+  const name = String(data.get("name") || "").trim();
+  const attending = data.get("attending");
+
+  if (!name)      { status.textContent = "Please enter your full name."; $("f-name").focus(); return; }
+  if (!attending) { status.textContent = "Please let us know if you can attend."; return; }
+  if (!CONFIG.rsvp.formId) { status.textContent = "RSVP is not connected yet."; return; }
+
+  const yes = attending === "Yes";
   const body = new URLSearchParams();
-  Object.entries(CONFIG.rsvp.entries).forEach(([k, entry]) => body.append(entry, data.get(k) || ''));
-  const btn = $('submitBtn'); btn.disabled = true; btn.textContent = 'Sending…';
-  try{
-    await fetch(`https://docs.google.com/forms/d/e/${CONFIG.rsvp.formId}/formResponse`, { method:'POST', mode:'no-cors', body });
-    e.target.style.display = 'none'; $('thanks').style.display = 'block';
-  }catch{
-    btn.disabled = false; btn.textContent = 'Submit RSVP';
-    status.textContent = 'Your RSVP didn’t send. Check your connection and try again.';
+  body.append(CONFIG.rsvp.entries.name, name);
+  body.append(CONFIG.rsvp.entries.attending, attending);
+  body.append(CONFIG.rsvp.entries.count, yes ? data.get("count") : "");   // blank when declining
+  body.append(CONFIG.rsvp.entries.meal, yes ? (data.get("meal") || "") : "");
+  body.append(CONFIG.rsvp.entries.message, data.get("message") || "");
+
+  button.disabled = true;
+  button.textContent = "Sending…";
+
+  try {
+    await fetch(`https://docs.google.com/forms/d/e/${CONFIG.rsvp.formId}/formResponse`,
+      { method: "POST", mode: "no-cors", body });
+    form.hidden = true;
+    $("thanks").hidden = false;
+  } catch (error) {
+    console.error("RSVP submission error:", error);
+    button.disabled = false;
+    button.textContent = "Submit RSVP";
+    status.textContent = "Your RSVP didn’t send. Check your connection and try again.";
   }
 });
 </script>
+
 </body>
 </html>
